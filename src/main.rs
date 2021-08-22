@@ -6,7 +6,10 @@ use rand::Rng;
 use resources::*;
 use std::{thread, time::Duration};
 
-struct Agent;
+// ===========
+// Agent utils
+// ===========
+pub struct Agent;
 
 #[derive(Clone, PartialEq, Debug)]
 pub enum Status {
@@ -14,7 +17,7 @@ pub enum Status {
     Tagged,
     UnTaggable,
 }
-struct Position(usize, usize);
+pub struct Position(pub usize, pub usize);
 
 fn add_agents(
     mut commands: Commands,
@@ -34,6 +37,37 @@ fn add_agents(
     }
 }
 
+pub fn move_agents(
+    agents: Query<&mut Position, With<Agent>>,
+    mut rng: ResMut<Random>,
+    grid_size: Res<InputSize>,
+) {
+    let position_add =
+        |current_axis_position: usize| -> usize { (current_axis_position + 1) % (grid_size.0 - 1) };
+    let position_sub = |current_axis_position: usize| -> usize {
+        if current_axis_position == 0 {
+            // last index
+            grid_size.0 - 1
+        } else {
+            current_axis_position - 1
+        }
+    };
+
+    agents.for_each_mut(|mut position| {
+        let direction = rng.0.gen_range(0..4);
+        match direction {
+            // on edges - pop out on the other side
+            0 => position.0 = position_add(position.0),
+            1 => position.0 = position_sub(position.0),
+            2 => position.1 = position_add(position.1),
+            _ => position.1 = position_sub(position.1),
+        }
+    });
+}
+
+// ==========
+// Grid utils
+// ==========
 fn sleep2s(sleep_in_millis: Res<InputTime>) {
     thread::sleep(Duration::from_millis(sleep_in_millis.0));
 }
@@ -89,6 +123,7 @@ fn main() {
         .add_plugin(LoadResources)
         .add_startup_system(add_agents.system())
         // Run every tick
+        .add_system(move_agents.system())
         .add_system(update_grid.system().label(UPDATE_GRID))
         .add_system(print_grid.system().label(PRINT_GRID).after(UPDATE_GRID))
         .add_system(sleep2s.system().label(SLEEP).after(PRINT_GRID))
