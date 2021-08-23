@@ -22,26 +22,33 @@ pub fn update_grid(
     grid.0 = new_grid.0;
 }
 
-pub fn print_grid(grid: Res<Grid>, grid_size: Res<InputSize>, tag_count: Res<TagCount>) {
-    // clear terminal
-    print!("\x1B[2J");
-    println!(" __{}__", "__".repeat(grid_size.0));
-    println!("|  {}  |", "__".repeat(grid_size.0));
+pub fn print_grid(
+    grid: Res<Grid>,
+    disable_grid: Res<InputDisableGrid>,
+    grid_size: Res<InputSize>,
+    tag_count: Res<TagCount>,
+) {
+    if !disable_grid.0 {
+        // clear terminal
+        print!("\x1B[2J");
+        println!(" __{}__", "__".repeat(grid_size.0));
+        println!("|  {}  |", "__".repeat(grid_size.0));
 
-    grid.0.iter().for_each(|row| {
-        let line: String = row
-            .iter()
-            .map(|field| match field {
-                Some(Status::Tagged) => "😈️",
-                Some(Status::UnTaggable) => "😀️",
-                Some(Status::Normal) => "🐏️",
-                None => "  ",
-            })
-            .collect();
-        println!("| |{}| |", line)
-    });
+        grid.0.iter().for_each(|row| {
+            let line: String = row
+                .iter()
+                .map(|field| match field {
+                    Some(Status::Tagged) => "😈️",
+                    Some(Status::UnTaggable) => "😀️",
+                    Some(Status::Normal) => "🐏️",
+                    None => "  ",
+                })
+                .collect();
+            println!("| |{}| |", line)
+        });
 
-    println!("| |{}| |", "__".repeat(grid_size.0));
-    println!("|__{}__|", "__".repeat(grid_size.0));
-    println!("Total count of exchanged tags: {}", tag_count.0)
+        println!("| |{}| |", "__".repeat(grid_size.0));
+        println!("|__{}__|", "__".repeat(grid_size.0));
+        println!("Total count of exchanged tags: {}", tag_count.0)
+    }
 }

@@ -9,13 +9,14 @@ pub struct InputAgents(pub usize);
 pub struct InputTime(pub u64);
 pub struct InputSize(pub usize);
 pub struct InputAnnounceTag(pub bool);
-
-// Todo:
-pub struct InputMoves(pub usize);
 pub struct InputDisableGrid(pub bool);
+pub struct InputMoves(pub usize);
 
 #[derive(Default)]
-pub struct TagCount(pub u32);
+pub struct TagCount(pub usize);
+#[derive(Default)]
+pub struct MoveCount(pub usize);
+
 pub struct Random(pub SmallRng);
 pub struct Grid(pub Vec<Vec<Option<Status>>>);
 
@@ -38,6 +39,7 @@ impl Plugin for LoadResources {
             .insert_resource(InputDisableGrid(disable_grid))
             .insert_resource(Random(SmallRng::from_entropy()))
             .insert_resource(Grid(Vec::with_capacity(size)))
-            .init_resource::<TagCount>();
+            .init_resource::<TagCount>()
+            .init_resource::<MoveCount>();
     }
 }
