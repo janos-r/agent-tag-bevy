@@ -1,6 +1,6 @@
 use super::input::Input;
 use super::Status;
-use bevy::prelude::*;
+use bevy::prelude::{AppBuilder, Plugin};
 use rand::{rngs::SmallRng, SeedableRng};
 use structopt::StructOpt;
 
@@ -8,8 +8,10 @@ use structopt::StructOpt;
 pub struct InputAgents(pub usize);
 pub struct InputTime(pub u64);
 pub struct InputSize(pub usize);
-pub struct InputMoves(pub usize);
 pub struct InputAnnounceTag(pub bool);
+
+// Todo:
+pub struct InputMoves(pub usize);
 pub struct InputDisableGrid(pub bool);
 
 #[derive(Default)]
