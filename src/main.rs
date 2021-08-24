@@ -16,7 +16,6 @@ fn sleep2s(sleep_in_millis: Res<InputTime>) {
 }
 
 // Terminate if the desired number of moves ticked - for benchmarking
-
 fn exit(
     mut move_count: ResMut<MoveCount>,
     terminate_in_move: Res<InputMoves>,
