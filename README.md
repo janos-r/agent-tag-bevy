@@ -8,7 +8,7 @@ This is a refactor of my previous challenge [agent-tag](https://github.com/janos
 
 ## Problems
 
-I had issues with very basic principles while using pointers. I have a `Vec<Agents>`, but every single `Agent` wats to have a link to the parent `Vec` also. I made it work with weak links. Luckily I found this excelent page in the [Rust Book](https://doc.rust-lang.org/stable/book/ch15-06-reference-cycles.html#adding-a-reference-from-a-child-to-its-parent) that perfectly describes this issue. You get a stack overflow, a reference cycle, if a child references it's own parent with just a Rc. Thanks to the Weak link, that is blind until it's upgraded, you get the structure working. But if you than want to use it for mutation, you still can't use a already used reference, so you have to hack around it like I did with cloning the whole state and using only its links that way. This can be seen in the example from my old code bellow with my original comments that I left there for future me.
+I had issues with very basic principles while using pointers. I have a `Vec<Agents>`, but every single `Agent` wats to have a link to the parent `Vec` also. I made it work with weak links. Luckily I found this excellent page in the [Rust Book](https://doc.rust-lang.org/stable/book/ch15-06-reference-cycles.html#adding-a-reference-from-a-child-to-its-parent) that perfectly describes this issue. You get a stack overflow, a reference cycle, if a child references it's own parent with just a Rc. Thanks to the Weak link, that is blind until it's upgraded, you get the structure working. But if you than want to use it for mutation, you still can't use a already used reference, so you have to hack around it like I did with cloning the whole state and using only its links that way. This can be seen in the example from my old code bellow with my original comments that I left there for future me.
 
 This later version was made with `Arc<Mutex<World>>` for the parent and you can just clone it to the Agents. But the proper single-thread code was with `Rc<RefCell<World>>` for the parent and through `Rc::downgrade(world)` you store it in the agents as `Weak<RefCell<World>>`. That's why in this example, you access the links with just `.lock()`. In the single-thread case you have to use `.borrow()` and `.borrow_mut()` when working from the parent (World). And prepend it with `.upgrade()` when working from inside the child (Agent). It's ironic that the single-thread syntax is a little more complicated, but it is good to know both ways.
 
@@ -60,7 +60,7 @@ This is my first time using Bevy, so all my negative comments are probably just 
 .position(|agent| {...})
 ```
 
-`.position()` is Rusts' own tool to give you a `Options<T>` with the index where it maybe found something. In bevy, if I didn't miss something, if I want to check the first matching entity and continue to use it for other tings, I had to do this with:
+[`.position()`](https://doc.rust-lang.org/stable/std/iter/trait.Iterator.html#method.position) is Rusts' own tool to give you a `Options<usize>` with the index where it maybe found something. In bevy, if I didn't miss something, if I want to check the first matching entity and continue to use it for other tings, I had to do this with:
 
 ```rust
 let mut origin: Option<Entity> = None;
